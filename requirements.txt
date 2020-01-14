@@ -1,0 +1,6 @@
+microbit
+microfs==1.4.1
+pseudo-microbit==1.8
+pyminifier==2.1
+pyserial==3.4
+uflash==1.3.0
