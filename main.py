@@ -1,62 +1,56 @@
+import random
 import time
 
 from microbit import *
+import tinybit
 
 
-
-# stage 2 name tags
-
-"""
-display.scroll("shay")
-time.sleep(1)
-display.scroll("yoni")
-time.sleep(1)
-display.scroll("yaron")
-time.sleep(1)
-display.clear()
-"""
-
-# stage G smiling buttons
-"""
-while True:
-    if button_a.is_pressed():
-        display.show(Image.HAPPY)
-    elif button_b.is_pressed():
-        display.show(Image.SAD)
-    else:
-        display.clear()
-"""
+def taunt():
+    display.show("T")
+    import music
+    music.play(music.BA_DING)
 
 
-# stage 4 logo​
-"""
-logo = [
-    [5, 9, 9, 9, 5],
-    [2, 9, 0, 9, 2],
-    [5, 9, 9, 9, 5],
-    [2, 9, 0, 9, 2],
-    [5, 9, 9, 9, 5]
-]
-for x in range(5):
-    for y in range(5):
-        display.set_pixel(x, y, logo[y][x])
-"""
+def wait_for_opponent():
+    position = accelerometer.get_values()
+    sensitivity = 1500
 
-# stage 3 beating heart
-"""
-for i in range(1, 10):
-    display.show(Image.HEART)
-    time.sleep(1)
-    display.clear()
-    time.sleep(1)
-"""
+    initial_sumo_distance = tinybit.ultrasonic()
+    MINIMUM_DISTANCE=5
+    while True:
+        # Check not touched
+        movement = accelerometer.get_values()
+        if any([(movement[i] - position[i]) > sensitivity for i in range(3)]):
+            display.show("N")
+            return
+        position = movement
 
-# stage 1
-"""
-display.scroll("hello world")
-"""
+        current_sumo_distance = tinybit.ultrasonic()
+        if (current_sumo_distance < MINIMUM_DISTANCE) or (current_sumo_distance < initial_sumo_distance / 2):
+            display.show(Image.ANGRY)
+            return
 
-# stage 1
-"""
-display.show(Image.HEART)
-"""
+
+def dodge():
+    # turn
+    random.choice([tinybit.car_spinright, tinybit.car_spinleft])(220)
+    # tinybit.car_spinright(220)
+    time.sleep(0.1)
+
+    tinybit.car_run(0)
+    # escape
+    while (not tinybit.traking_sensor_L()) or (not tinybit.traking_sensor_R()):
+        tinybit.car_run(42)
+    tinybit.car_back(255)
+    time.sleep(0.1)
+
+    tinybit.car_run(0)
+
+
+def main():
+    while True:
+        taunt()
+        wait_for_opponent()
+        dodge()
+
+main()
