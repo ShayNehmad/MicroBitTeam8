@@ -6,17 +6,18 @@ import tinybit
 
 
 def taunt():
-    display.show("T")
+    display.show("!")
     import music
     music.play(music.BA_DING)
 
 
 def wait_for_opponent():
     position = accelerometer.get_values()
-    sensitivity = 1500
+    sensitivity = 2000
 
     initial_sumo_distance = tinybit.ultrasonic()
-    MINIMUM_DISTANCE=5
+    MINIMUM_DISTANCE = 10
+
     while True:
         # Check not touched
         movement = accelerometer.get_values()
@@ -33,24 +34,36 @@ def wait_for_opponent():
 
 def dodge():
     # turn
-    random.choice([tinybit.car_spinright, tinybit.car_spinleft])(220)
-    # tinybit.car_spinright(220)
+    dodge_f = random.choice([tinybit.car_turnright, tinybit.car_turnleft])
+    dodge_f(200)
+    time.sleep(0.1)
+
+    # stop
+    tinybit.car_run(0)
+
+    # escape
+    while (not tinybit.traking_sensor_L()) or (not tinybit.traking_sensor_R()):
+        tinybit.car_run(100)
+    tinybit.car_back(200)
     time.sleep(0.1)
 
     tinybit.car_run(0)
-    # escape
-    while (not tinybit.traking_sensor_L()) or (not tinybit.traking_sensor_R()):
-        tinybit.car_run(42)
-    tinybit.car_back(255)
-    time.sleep(0.1)
 
+
+def push():
+    display.show("P")
+    tinybit.car_run(190)
+    time.sleep(1)
     tinybit.car_run(0)
 
 
 def main():
     while True:
         taunt()
-        wait_for_opponent()
-        dodge()
+        #wait_for_opponent()
+        #crazy()
+        #dodge()
+        push()
+
 
 main()
